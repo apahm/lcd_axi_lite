@@ -342,7 +342,7 @@ module lcd #(
                	LCD_WAIT_VALID: begin
                		if(lcd_valid) begin
                			lcd_ready_r <= 1'b0;
-               			lcd_state_r <= WRITE_UPPER_LINE;
+               			lcd_state_r <= CUR_FIRST_ROW;
                			upper_line[0] <= lcd_data_str_0_0[7:0]; 
 						upper_line[1] <= lcd_data_str_0_0[15:8]; 
 						upper_line[2] <= lcd_data_str_0_0[23:16];
@@ -376,9 +376,10 @@ module lcd #(
 						lower_line[13] <= lcd_data_str_1_3[15:8]; 
 						lower_line[14] <= lcd_data_str_1_3[23:16]; 
 						lower_line[15] <= lcd_data_str_1_3[31:24]; 
-               		end else
+               		end else begin
                			lcd_ready_r <= 1'b1;
 						lcd_state_r <= LCD_WAIT_VALID;
+               		end
                	end
 				WRITE_UPPER_LINE: begin
 					if(counter_r < wait__1us) begin

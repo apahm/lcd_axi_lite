@@ -157,7 +157,7 @@ module tb_lcd();
 		sys_rst = 1'b1;
 	    delayT_t(5, 4000);
 	    sys_rst = 1'b0;
-		delayT_t(5, 1000);
+		delayT_t(5, 10000000);
 
 	    AXI4_Lite_W(T_SYS_CLK, ADDR_DATA_STR_0_0, {upper_line[0], upper_line[1], upper_line[2], upper_line[3]});
 	    AXI4_Lite_W(T_SYS_CLK, ADDR_DATA_STR_0_1, {upper_line[4], upper_line[5], upper_line[6], upper_line[7]});
