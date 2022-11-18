@@ -7,7 +7,18 @@ module lcd #(
 	input wire clk,    
 	input wire rst, 
 	output wire [2:0] ctrl_lcd,
-	output wire [3:0] data_lcd
+	output wire [3:0] data_lcd,
+
+	output wire 		lcd_ready,
+ 	input wire 			lcd_valid,
+ 	input wire [31:0] 	lcd_data_str_0_0,
+ 	input wire [31:0] 	lcd_data_str_0_1,
+ 	input wire [31:0] 	lcd_data_str_0_2,
+ 	input wire [31:0] 	lcd_data_str_0_3,
+ 	input wire [31:0] 	lcd_data_str_1_0,
+ 	input wire [31:0] 	lcd_data_str_1_1,
+ 	input wire [31:0] 	lcd_data_str_1_2,
+ 	input wire [31:0] 	lcd_data_str_1_3
 );
 
 	localparam [3:0]
@@ -26,7 +37,7 @@ module lcd #(
 		CUR_SECOND_ROW = 4'd12,
 		WRITE_LOWER_LINE = 4'd13,
 		COUNTER_LOWER_LINE = 4'd14,
-		DONE = 4'd15;
+		LCD_WAIT_VALID = 4'd15;
 
 	reg [3:0] lcd_state_r;		
 	reg [2:0] ctrl_lcd_r; 
@@ -38,6 +49,8 @@ module lcd #(
 
 	reg [7:0] upper_line [15:0];
 	reg [7:0] lower_line [15:0];
+
+	reg lcd_ready_r;
 
 	parameter integer wait__1us = 1 * CYCLES_PER_US;
 	parameter integer wait__2us = 2 * CYCLES_PER_US;    // 10us 
@@ -53,6 +66,7 @@ module lcd #(
 	
 	assign ctrl_lcd = ctrl_lcd_r; // {RS, RW, E} 2, 1, 0
 	assign data_lcd = data_lcd_r;
+	assign lcd_ready = lcd_ready_r;
 
 	initial begin
 		upper_line[0] = 8'h46; // F
@@ -98,6 +112,7 @@ module lcd #(
         	counter_r <= 32'b0;
         	counter_upper_line_r <= 4'b0;
 			counter_lower_line_r <= 4'b0;
+			lcd_ready_r <= 1'b0;
         end else begin
             case (lcd_state_r)
                 WAITING: begin 
@@ -324,6 +339,47 @@ module lcd #(
                 		lcd_state_r <= WRITE_UPPER_LINE;
                 	end
                	end
+               	LCD_WAIT_VALID: begin
+               		if(lcd_valid) begin
+               			lcd_ready_r <= 1'b0;
+               			lcd_state_r <= WRITE_UPPER_LINE;
+               			upper_line[0] <= lcd_data_str_0_0[7:0]; 
+						upper_line[1] <= lcd_data_str_0_0[15:8]; 
+						upper_line[2] <= lcd_data_str_0_0[23:16];
+						upper_line[3] <= lcd_data_str_0_0[31:24];
+						upper_line[4] <= lcd_data_str_0_1[7:0]; 
+						upper_line[5] <= lcd_data_str_0_1[15:8]; 
+						upper_line[6] <= lcd_data_str_0_1[23:16]; 
+						upper_line[7] <= lcd_data_str_0_1[31:24]; 
+						upper_line[8] <=  lcd_data_str_0_2[7:0];  
+						upper_line[9] <=  lcd_data_str_0_2[15:8]; 
+						upper_line[10] <= lcd_data_str_0_2[23:16]; 
+						upper_line[11] <= lcd_data_str_0_2[31:24]; 
+						upper_line[12] <= lcd_data_str_0_3[7:0]; 
+						upper_line[13] <= lcd_data_str_0_3[15:8]; 
+						upper_line[14] <= lcd_data_str_0_3[23:16]; 
+						upper_line[15] <= lcd_data_str_0_3[31:24]; 
+
+               			lower_line[0] <= lcd_data_str_1_0[7:0]; 
+						lower_line[1] <= lcd_data_str_1_0[15:8];
+						lower_line[2] <= lcd_data_str_1_0[23:16]; 
+						lower_line[3] <= lcd_data_str_1_0[31:24]; 
+						lower_line[4] <= lcd_data_str_1_1[7:0]; 
+						lower_line[5] <= lcd_data_str_1_1[15:8];
+						lower_line[6] <= lcd_data_str_1_1[23:16]; 
+						lower_line[7] <= lcd_data_str_1_1[31:24];
+						lower_line[8] <=  lcd_data_str_1_2[7:0];
+						lower_line[9] <=  lcd_data_str_1_2[15:8]; 
+						lower_line[10] <= lcd_data_str_1_2[23:16];
+						lower_line[11] <= lcd_data_str_1_2[31:24];
+						lower_line[12] <= lcd_data_str_1_3[7:0]; 
+						lower_line[13] <= lcd_data_str_1_3[15:8]; 
+						lower_line[14] <= lcd_data_str_1_3[23:16]; 
+						lower_line[15] <= lcd_data_str_1_3[31:24]; 
+               		end else
+               			lcd_ready_r <= 1'b1;
+						lcd_state_r <= LCD_WAIT_VALID;
+               	end
 				WRITE_UPPER_LINE: begin
 					if(counter_r < wait__1us) begin
                 		counter_r <= counter_r + 1;
@@ -429,14 +485,11 @@ module lcd #(
 				COUNTER_LOWER_LINE: begin
                		if(counter_lower_line_r == 32'd15) begin
 						counter_lower_line_r <= 32'b0;
-						lcd_state_r <= DONE;		
+						lcd_state_r <= LCD_WAIT_VALID;		
                 	end else begin
 	                	counter_lower_line_r <= counter_lower_line_r + 1;
 	                	lcd_state_r <= WRITE_LOWER_LINE;
                 	end
-               	end
-               	DONE: begin
-               		lcd_state_r <= DONE;
                	end
             endcase
         end

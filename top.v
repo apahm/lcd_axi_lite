@@ -1,31 +1,36 @@
 `timescale 1 ns / 1 ps
 
 module top_lcd #(
-	parameter integer C_S00_AXI_DATA_WIDTH	= 32,
-	parameter integer C_S00_AXI_ADDR_WIDTH	= 6
+	parameter integer AXI_DATA_WIDTH	= 32,
+	parameter integer AXI_ADDR_WIDTH	= 6
 )
 (
-	input wire  s00_axi_aclk,
-	input wire  s00_axi_aresetn,
-	input wire [C_S00_AXI_ADDR_WIDTH-1 : 0] s00_axi_awaddr,
-	input wire [2 : 0] s00_axi_awprot,
-	input wire  s00_axi_awvalid,
-	output wire  s00_axi_awready,
-	input wire [C_S00_AXI_DATA_WIDTH-1 : 0] s00_axi_wdata,
-	input wire [(C_S00_AXI_DATA_WIDTH/8)-1 : 0] s00_axi_wstrb,
-	input wire  s00_axi_wvalid,
-	output wire  s00_axi_wready,
-	output wire [1 : 0] s00_axi_bresp,
-	output wire  s00_axi_bvalid,
-	input wire  s00_axi_bready,
-	input wire [C_S00_AXI_ADDR_WIDTH-1 : 0] s00_axi_araddr,
-	input wire [2 : 0] s00_axi_arprot,
-	input wire  s00_axi_arvalid,
-	output wire  s00_axi_arready,
-	output wire [C_S00_AXI_DATA_WIDTH-1 : 0] s00_axi_rdata,
-	output wire [1 : 0] s00_axi_rresp,
-	output wire  s00_axi_rvalid,
-	input wire  s00_axi_rready,
+	input wire  							s00_axi_aclk,
+	input wire  							s00_axi_aresetn,
+	
+	input wire [AXI_ADDR_WIDTH-1 : 0] 		s00_axi_awaddr,
+	input wire [2 : 0] 						s00_axi_awprot,
+	input wire  							s00_axi_awvalid,
+	output wire  							s00_axi_awready,
+	
+	input wire [AXI_DATA_WIDTH-1 : 0] 		s00_axi_wdata,
+	input wire [(AXI_DATA_WIDTH/8)-1 : 0] 	s00_axi_wstrb,
+	input wire  							s00_axi_wvalid,
+	output wire  							s00_axi_wready,
+	
+	output wire [1 : 0] 					s00_axi_bresp,
+	output wire  							s00_axi_bvalid,
+	input wire  							s00_axi_bready,
+	
+	input wire [AXI_ADDR_WIDTH-1 : 0] 		s00_axi_araddr,
+	input wire [2 : 0] 						s00_axi_arprot,
+	input wire  							s00_axi_arvalid,
+	output wire  							s00_axi_arready,
+	
+	output wire [AXI_DATA_WIDTH-1 : 0] 		s00_axi_rdata,
+	output wire [1 : 0] 					s00_axi_rresp,
+	output wire  							s00_axi_rvalid,
+	input wire  							s00_axi_rready,
 
 	// LCD data bus
 	output wire [3:0] lcd_data, 
@@ -37,11 +42,11 @@ module top_lcd #(
 	output wire lcd_rw	
 );
 
-lcd_control_v1_0_S00_AXI # ( 
-	.C_S_AXI_DATA_WIDTH(C_S00_AXI_DATA_WIDTH),
-	.C_S_AXI_ADDR_WIDTH(C_S00_AXI_ADDR_WIDTH)
+lcd_control_axi_lite # ( 
+	.AXI_DATA_WIDTH(AXI_DATA_WIDTH),
+	.AXI_ADDR_WIDTH(AXI_ADDR_WIDTH)
 ) 
-lcd_control_v1_0_S00_AXI_inst 
+lcd_control_axi_lite_inst 
 (
 	.S_AXI_ACLK(s00_axi_aclk),
 	.S_AXI_ARESETN(s00_axi_aresetn),

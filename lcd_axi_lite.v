@@ -1,28 +1,28 @@
 `timescale 1 ns / 1 ps
 
-module lcd_control_v1_0_S00_AXI #(
-	parameter integer C_S_AXI_DATA_WIDTH	= 32,
-	parameter integer C_S_AXI_ADDR_WIDTH	= 6
+module lcd_control_axi_lite #(
+	parameter integer AXI_DATA_WIDTH	= 32,
+	parameter integer AXI_ADDR_WIDTH	= 6
 )
 (
 	input wire  S_AXI_ACLK,
 	input wire  S_AXI_ARESETN,
-	input wire [C_S_AXI_ADDR_WIDTH-1 : 0] S_AXI_AWADDR,
+	input wire [AXI_ADDR_WIDTH-1 : 0] S_AXI_AWADDR,
 	input wire [2 : 0] S_AXI_AWPROT,
 	input wire  S_AXI_AWVALID,
 	output wire  S_AXI_AWREADY,
-	input wire [C_S_AXI_DATA_WIDTH-1 : 0] S_AXI_WDATA,
-	input wire [(C_S_AXI_DATA_WIDTH/8)-1 : 0] S_AXI_WSTRB,
+	input wire [AXI_DATA_WIDTH-1 : 0] S_AXI_WDATA,
+	input wire [(AXI_DATA_WIDTH/8)-1 : 0] S_AXI_WSTRB,
 	input wire  S_AXI_WVALID,
 	output wire  S_AXI_WREADY,
 	output wire [1 : 0] S_AXI_BRESP,
 	output wire  S_AXI_BVALID,
 	input wire  S_AXI_BREADY,
-	input wire [C_S_AXI_ADDR_WIDTH-1 : 0] S_AXI_ARADDR,
+	input wire [AXI_ADDR_WIDTH-1 : 0] S_AXI_ARADDR,
 	input wire [2 : 0] S_AXI_ARPROT,
 	input wire  S_AXI_ARVALID,
 	output wire  S_AXI_ARREADY,
-	output wire [C_S_AXI_DATA_WIDTH-1 : 0] S_AXI_RDATA,
+	output wire [AXI_DATA_WIDTH-1 : 0] S_AXI_RDATA,
 	output wire [1 : 0] S_AXI_RRESP,
 	output wire  S_AXI_RVALID,
 	input wire  S_AXI_RREADY,
@@ -39,32 +39,32 @@ module lcd_control_v1_0_S00_AXI #(
 	output wire [31:0] lcd_data_str_1_3
 );
 
-	reg [C_S_AXI_ADDR_WIDTH-1 : 0] 	axi_awaddr;
+	reg [AXI_ADDR_WIDTH-1 : 0] 	axi_awaddr;
 	reg  	axi_awready;
 	reg  	axi_wready;
 	reg [1 : 0] 	axi_bresp;
 	reg  	axi_bvalid;
-	reg [C_S_AXI_ADDR_WIDTH-1 : 0] 	axi_araddr;
+	reg [AXI_ADDR_WIDTH-1 : 0] 	axi_araddr;
 	reg  	axi_arready;
-	reg [C_S_AXI_DATA_WIDTH-1 : 0] 	axi_rdata;
+	reg [AXI_DATA_WIDTH-1 : 0] 	axi_rdata;
 	reg [1 : 0] 	axi_rresp;
 	reg  	axi_rvalid;
 
-	localparam integer ADDR_LSB = (C_S_AXI_DATA_WIDTH/32) + 1;
+	localparam integer ADDR_LSB = (AXI_DATA_WIDTH/32) + 1;
 	localparam integer OPT_MEM_ADDR_BITS = 3;
 	
-	reg [C_S_AXI_DATA_WIDTH-1:0]	data_str_0_0;
-	reg [C_S_AXI_DATA_WIDTH-1:0]	data_str_0_1;
-	reg [C_S_AXI_DATA_WIDTH-1:0]	data_str_0_2;
-	reg [C_S_AXI_DATA_WIDTH-1:0]	data_str_0_3;
-	reg [C_S_AXI_DATA_WIDTH-1:0]	data_str_1_0;
-	reg [C_S_AXI_DATA_WIDTH-1:0]	data_str_1_1;
-	reg [C_S_AXI_DATA_WIDTH-1:0]	data_str_1_2;
-	reg [C_S_AXI_DATA_WIDTH-1:0]	data_str_1_3;
-	reg [C_S_AXI_DATA_WIDTH-1:0]	valid_lcd_control;
+	reg [AXI_DATA_WIDTH-1:0]	data_str_0_0;
+	reg [AXI_DATA_WIDTH-1:0]	data_str_0_1;
+	reg [AXI_DATA_WIDTH-1:0]	data_str_0_2;
+	reg [AXI_DATA_WIDTH-1:0]	data_str_0_3;
+	reg [AXI_DATA_WIDTH-1:0]	data_str_1_0;
+	reg [AXI_DATA_WIDTH-1:0]	data_str_1_1;
+	reg [AXI_DATA_WIDTH-1:0]	data_str_1_2;
+	reg [AXI_DATA_WIDTH-1:0]	data_str_1_3;
+	reg [AXI_DATA_WIDTH-1:0]	valid_lcd_control;
 	wire	 						slv_reg_rden;
 	wire	 						slv_reg_wren;
-	reg [C_S_AXI_DATA_WIDTH-1:0]	reg_data_out;
+	reg [AXI_DATA_WIDTH-1:0]	reg_data_out;
 	integer	 byte_index;
 	reg	 aw_en;
 
@@ -169,49 +169,49 @@ module lcd_control_v1_0_S00_AXI #(
 	        case ( axi_awaddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB] )
 	          4'h0:
 	            for ( byte_index = 0; 
-	            	byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
+	            	byte_index <= (AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
 	              if ( S_AXI_WSTRB[byte_index] == 1 ) begin
 	                data_str_0_0[(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];
 	              end  
 	          4'h1:
 	            for ( byte_index = 0; 
-	            	byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
+	            	byte_index <= (AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
 	              if ( S_AXI_WSTRB[byte_index] == 1 ) begin
 	                data_str_0_1[(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];
 	              end  
 	          4'h2:
 	            for ( byte_index = 0; 
-	            	byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
+	            	byte_index <= (AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
 	              if ( S_AXI_WSTRB[byte_index] == 1 ) begin
 	                data_str_0_2[(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];
 	              end  
 	          4'h3:
 	            for ( byte_index = 0; 
-	            	byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
+	            	byte_index <= (AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
 	              if ( S_AXI_WSTRB[byte_index] == 1 ) begin
 	                data_str_0_3[(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];
 	              end  
 	          4'h4:
 	            for ( byte_index = 0; 
-	            	byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
+	            	byte_index <= (AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
 	              if ( S_AXI_WSTRB[byte_index] == 1 ) begin
 	                data_str_1_0[(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];
 	              end  
 	          4'h5:
 	            for ( byte_index = 0; 
-	            	byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
+	            	byte_index <= (AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
 	              if ( S_AXI_WSTRB[byte_index] == 1 ) begin
 	                data_str_1_1[(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];
 	              end  
 	          4'h6:
 	            for ( byte_index = 0; 
-	            	byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
+	            	byte_index <= (AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
 	              if ( S_AXI_WSTRB[byte_index] == 1 ) begin
 	                data_str_1_2[(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];
 	              end  
 	          4'h7:
 	            for ( byte_index = 0; 
-	            	byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
+	            	byte_index <= (AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
 	              if ( S_AXI_WSTRB[byte_index] == 1 ) begin
 	                data_str_1_3[(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];
 	              end   
